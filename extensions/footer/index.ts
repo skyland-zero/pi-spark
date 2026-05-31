@@ -27,7 +27,12 @@ class FooterComponent implements Component {
 	}
 
 	private renderMainLine(width: number): string {
-		return new SplitLine(this.getLeft(), this.getRight(), 0, 2, "right", " ", this.theme.fg("dim", "…")).render(width)[0];
+		const left = this.getLeft();
+		const right = this.getRight();
+		return new SplitLine(left, right, {
+			primarySide: "right",
+			ellipsis: this.theme.fg("dim", "…"),
+		}).render(width)[0];
 	}
 
 	private getLeft(): string {

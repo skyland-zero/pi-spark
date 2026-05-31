@@ -4,6 +4,12 @@ import { sanitizeText } from "../utils/format";
 
 import type { Component } from "@earendil-works/pi-tui";
 
+interface InlineTextOptions {
+	padding?: number;
+	spacingChar?: string;
+	ellipsis?: string;
+}
+
 /**
  * Text component that renders inline and truncates it to fit the given width.
  *
@@ -16,13 +22,14 @@ export class InlineText implements Component {
 	private spacingChar: string;
 	private ellipsis: string;
 
-	constructor(text: string, padding: number = 0, spacingChar: string = " ", ellipsis: string = "…") {
+	constructor(text: string, options: InlineTextOptions = {}) {
+		const spacingChar = options.spacingChar ?? " ";
 		if (visibleWidth(spacingChar) !== 1) throw new Error("spacingChar must have a visible width of 1");
 
 		this.text = sanitizeText(text);
-		this.padding = padding;
+		this.padding = options.padding ?? 0;
 		this.spacingChar = spacingChar;
-		this.ellipsis = ellipsis;
+		this.ellipsis = options.ellipsis ?? "…";
 	}
 
 	invalidate(): void {

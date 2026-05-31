@@ -4,7 +4,15 @@ import { InlineText } from "./inline-text";
 
 import type { Component } from "@earendil-works/pi-tui";
 
-export type Side = "left" | "right";
+type Side = "left" | "right";
+
+interface SplitLineOptions {
+	padding?: number;
+	gap?: number;
+	primarySide?: Side;
+	spacingChar?: string;
+	ellipsis?: string;
+}
 
 /** Single-line component that places left and right text at opposite sides. */
 export class SplitLine implements Component {
@@ -15,14 +23,16 @@ export class SplitLine implements Component {
 	private primarySide: Side;
 	private spacingChar: string;
 
-	constructor(left: InlineText | string, right: InlineText | string, padding: number = 0, gap: number = 1, primarySide: Side = "left", spacingChar: string = " ", ellipsis: string = "…") {
+	constructor(left: InlineText | string, right: InlineText | string, options: SplitLineOptions = {}) {
+		const spacingChar = options.spacingChar ?? " ";
 		if (visibleWidth(spacingChar) !== 1) throw new Error("spacingChar must have a visible width of 1");
 
-		this.left = typeof left === "string" ? new InlineText(left, padding, " ", ellipsis) : left;
-		this.right = typeof right === "string" ? new InlineText(right, padding, " ", ellipsis) : right;
-		this.padding = padding;
-		this.gap = gap;
-		this.primarySide = primarySide;
+		const inlineTextOptions = { padding: options.padding ?? 0, ellipsis: options.ellipsis ?? "…" };
+		this.left = typeof left === "string" ? new InlineText(left, inlineTextOptions) : left;
+		this.right = typeof right === "string" ? new InlineText(right, inlineTextOptions) : right;
+		this.padding = options.padding ?? 0;
+		this.gap = options.gap ?? 2;
+		this.primarySide = options.primarySide ?? "left";
 		this.spacingChar = spacingChar;
 	}
 

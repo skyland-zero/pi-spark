@@ -108,7 +108,11 @@ class Editor extends CustomEditor {
 		const left = theme.fg("accent", this.spinner.getFrame());
 		const right = theme.fg("dim", formatModel(this.ctx.model?.provider, this.ctx.model?.id, this.pi.getThinkingLevel()));
 
-		return new SplitLine(left, right, 1, 2, "left", this.borderColor("─"), theme.fg("dim", "…")).render(width)[0];
+		return new SplitLine(left, right, {
+			padding: 1,
+			spacingChar: this.borderColor("─"),
+			ellipsis: theme.fg("dim", "…"),
+		}).render(width)[0];
 	}
 }
 
