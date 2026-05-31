@@ -3,50 +3,63 @@ import { CustomEditor } from "@earendil-works/pi-coding-agent";
 import { SplitLine } from "../shared/components/split-line";
 import { formatModel } from "../shared/utils/format";
 
-import type { ExtensionContext, ExtensionAPI, KeybindingsManager } from "@earendil-works/pi-coding-agent";
+import type { ExtensionAPI, ExtensionContext, KeybindingsManager } from "@earendil-works/pi-coding-agent";
 import type { TUI, EditorTheme } from "@earendil-works/pi-tui";
 
 const SPINNER_FRAMES = ["○○○○", "●○○○", "○●○○", "○○●○", "○○○●", "●●○○", "●○●○", "●○○●", "○●●○", "○●○●", "○○●●", "●●●○", "●●○●", "●○●●", "○●●●", "●●●●"];
 const SPINNER_MIN_INTERVAL_MS = 120;
 const SPINNER_MAX_INTERVAL_MS = 240;
 
+interface SpinnerOptions {
+	frames?: string[];
+	interval?: number | { min: number; max: number };
+	random?: boolean;
+}
+
 class Spinner {
 	private tui: TUI | undefined;
+
+	private frames: string[];
+	private interval: number | { min: number; max: number };
+	private random: boolean;
+
 	private working: boolean = false;
-	private frame: string = this.randomFrame();
+	private frameIndex: number = -1;
 	private timer: ReturnType<typeof setTimeout> | undefined;
+
+	constructor(options: SpinnerOptions = {}) {
+		this.frames = options.frames?.length ? options.frames : SPINNER_FRAMES;
+		this.interval = options.interval ?? { min: SPINNER_MIN_INTERVAL_MS, max: SPINNER_MAX_INTERVAL_MS };
+		this.random = options.random ?? true;
+	}
 
 	setTUI(tui: TUI): void {
 		this.tui = tui;
 	}
 
-	isWorking(): boolean {
-		return this.working;
-	}
-
 	getFrame(): string {
-		return this.frame;
+		if (!this.working) return "";
+
+		return this.frames[this.frameIndex] ?? "";
 	}
 
 	start(): void {
 		this.stop();
 
 		this.working = true;
-		this.frame = this.randomFrame();
-
-		this.requestRender();
-		this.scheduleTick();
+		this.tick();
 	}
 
 	stop(): void {
 		this.working = false;
+		this.frameIndex = -1;
 
 		if (this.timer) {
 			clearTimeout(this.timer);
 			this.timer = undefined;
 		}
 
-		this.requestRender();
+		this.tui?.requestRender();
 	}
 
 	dispose(): void {
@@ -54,28 +67,14 @@ class Spinner {
 		this.tui = undefined;
 	}
 
-	private requestRender(): void {
-		this.tui?.requestRender();
-	}
-
-	private scheduleTick(): void {
+	private tick(): void {
 		if (!this.working) return;
 
-		this.timer = setTimeout(() => {
-			if (!this.working) return;
-			this.frame = this.randomFrame();
+		this.frameIndex = this.random ? Math.floor(Math.random() * this.frames.length) : (this.frameIndex + 1) % this.frames.length;
+		this.tui?.requestRender();
 
-			this.requestRender();
-			this.scheduleTick();
-		}, this.randomInterval());
-	}
-
-	private randomFrame(): string {
-		return SPINNER_FRAMES[Math.floor(Math.random() * SPINNER_FRAMES.length)]!;
-	}
-
-	private randomInterval(): number {
-		return SPINNER_MIN_INTERVAL_MS + Math.floor(Math.random() * (SPINNER_MAX_INTERVAL_MS - SPINNER_MIN_INTERVAL_MS + 1));
+		const delay = typeof this.interval === "number" ? this.interval : this.interval.min + Math.floor(Math.random() * (this.interval.max - this.interval.min + 1));
+		this.timer = setTimeout(() => this.tick(), delay);
 	}
 }
 
@@ -106,7 +105,7 @@ class Editor extends CustomEditor {
 	private renderTopBorder(width: number): string {
 		const theme = this.ctx.ui.theme;
 
-		const left = this.spinner.isWorking() ? theme.fg("accent", this.spinner.getFrame()) : "";
+		const left = theme.fg("accent", this.spinner.getFrame());
 		const right = theme.fg("dim", formatModel(this.ctx.model?.provider, this.ctx.model?.id, this.pi.getThinkingLevel()));
 
 		return new SplitLine(left, right, 1, 2, "left", this.borderColor("─"), theme.fg("dim", "…")).render(width)[0];

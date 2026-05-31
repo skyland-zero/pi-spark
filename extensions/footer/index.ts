@@ -27,7 +27,7 @@ class FooterComponent implements Component {
 	}
 
 	private renderMainLine(width: number): string {
-		return new SplitLine(this.getLeft(), this.getRight(), 0, 2, "right").render(width)[0];
+		return new SplitLine(this.getLeft(), this.getRight(), 0, 2, "right", " ", this.theme.fg("dim", "…")).render(width)[0];
 	}
 
 	private getLeft(): string {
