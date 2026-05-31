@@ -1,6 +1,6 @@
 import { truncateToWidth, visibleWidth } from "@earendil-works/pi-tui";
 
-import { sanitizeText } from "../utils/format";
+import { sanitizeText } from "../format";
 
 import type { Component } from "@earendil-works/pi-tui";
 

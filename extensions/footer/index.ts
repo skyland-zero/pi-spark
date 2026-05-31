@@ -2,7 +2,7 @@ import { isAbsolute, relative, resolve, sep } from "node:path";
 import { truncateToWidth } from "@earendil-works/pi-tui";
 
 import { SplitLine } from "../shared/components/split-line";
-import { formatContextUsage, formatCost, sanitizeText } from "../shared/utils/format";
+import { formatContextUsage, formatCost, sanitizeText } from "../shared/format";
 
 import type { ExtensionContext, ExtensionAPI, ReadonlyFooterDataProvider, Theme } from "@earendil-works/pi-coding-agent";
 import type { Component } from "@earendil-works/pi-tui";

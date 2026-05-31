@@ -1,7 +1,7 @@
 import { CustomEditor } from "@earendil-works/pi-coding-agent";
 
 import { SplitLine } from "../shared/components/split-line";
-import { formatModel } from "../shared/utils/format";
+import { formatModel } from "../shared/format";
 
 import type { ExtensionAPI, ExtensionContext, KeybindingsManager } from "@earendil-works/pi-coding-agent";
 import type { TUI, EditorTheme } from "@earendil-works/pi-tui";
