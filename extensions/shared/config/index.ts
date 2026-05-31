@@ -21,7 +21,7 @@ export function loadConfig(ctx: ExtensionContext, fileName: string = "spark.json
 
     const message = errors.map((error) => {
       const allowedValues = (error.params as any)?.allowedValues;
-      return `${error.instancePath} ${error.message}${allowedValues ? ` (${allowedValues.join(", ")})` : ""}`
+      return `${error.instancePath} ${error.message}${allowedValues ? ` (${allowedValues.join(", ")})` : ""}`;
     }).join("; ");
 
     ctx.ui.notify(`Invalid spark config: ${message}`, "error");
@@ -41,7 +41,7 @@ function loadMergedJson(paths: string[]): ConfigValue | undefined {
     if (value === undefined) return;
 
     merged = mergeConfig(merged, value);
-  })
+  });
 
   return merged;
 }
@@ -66,7 +66,7 @@ function mergeConfig(base: ConfigValue | undefined, override: ConfigValue): Conf
     } else {
       result[key] = overrideValue;
     }
-  })
+  });
 
   return result;
 }

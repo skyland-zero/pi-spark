@@ -27,10 +27,10 @@ class Editor extends CustomEditor {
     this.slots = { modelBefore: undefined };
   }
 
-	setSlot(slot: keyof typeof this.slots, value: string | undefined): void {
-		this.slots[slot] = value;
-		this.tui.requestRender();
-	}
+  setSlot(slot: keyof typeof this.slots, value: string | undefined): void {
+    this.slots[slot] = value;
+    this.tui.requestRender();
+  }
 
   render(width: number): string[] {
     const lines = super.render(width);
@@ -83,15 +83,15 @@ export default function (pi: ExtensionAPI) {
 
     ctx.ui.setWorkingVisible(false);
     ctx.ui.setEditorComponent((tui, theme, keybindings) => {
-			const editor = new Editor(pi, ctx, tui, theme, keybindings, spinner);
+      const editor = new Editor(pi, ctx, tui, theme, keybindings, spinner);
 
-			events.on(PRESET_CHANGE, (data) => {
-				const payload = parsePresetChange(data);
-				editor.setSlot("modelBefore", payload ? `preset:${payload}` : undefined);
-			});
+      events.on(PRESET_CHANGE, (data) => {
+        const payload = parsePresetChange(data);
+        editor.setSlot("modelBefore", payload ? `preset:${payload}` : undefined);
+      });
 
-			return editor;
-		});
+      return editor;
+    });
   });
 
   pi.on("agent_start", () => {
