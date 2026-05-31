@@ -4,14 +4,30 @@ import { getAgentDir } from "@earendil-works/pi-coding-agent";
 
 import { resolveUserConfig } from "./schema";
 
+import type { ExtensionContext } from "@earendil-works/pi-coding-agent";
+import type { TLocalizedValidationError } from "typebox/error";
 import type { UserConfig } from "./schema";
 
 type JsonValue = null | boolean | number | string | JsonValue[] | { [key: string]: JsonValue };
 type ConfigValue = { [key: string]: JsonValue };
 
-export function loadConfig(cwd: string, fileName: string = "spark.json"): UserConfig {
-  const userConfig = loadMergedJson(getConfigPaths(cwd, fileName));
-  return resolveUserConfig(userConfig ?? {});
+export function loadConfig(ctx: ExtensionContext, fileName: string = "spark.json"): UserConfig {
+  const userConfig = loadMergedJson(getConfigPaths(ctx.cwd, fileName));
+
+  try {
+    return resolveUserConfig(userConfig ?? {});
+  } catch (error) {
+    const errors = (error as any).cause?.errors as TLocalizedValidationError[];
+
+    const message = errors.map((error) => {
+      const allowedValues = (error.params as any)?.allowedValues;
+      return `${error.instancePath} ${error.message}${allowedValues ? ` (${allowedValues.join(", ")})` : ""}`
+    }).join("; ");
+
+    ctx.ui.notify(`Invalid spark config: ${message}`, "error");
+
+    return {};
+  }
 }
 
 function getConfigPaths(cwd: string, fileName: string): [globalPath: string, projectPath: string] {

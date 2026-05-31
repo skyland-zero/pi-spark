@@ -78,7 +78,7 @@ export default function (pi: ExtensionAPI) {
   pi.on("session_start", (_event, ctx) => {
     if (!ctx.hasUI) return;
 
-    const config = loadConfig(ctx.cwd);
+    const config = loadConfig(ctx);
     spinner = new Spinner(config?.editor?.spinner);
 
     ctx.ui.setWorkingVisible(false);
