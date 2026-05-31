@@ -6,15 +6,17 @@ import { formatModel } from "../shared/utils/format";
 import type { ExtensionAPI, ExtensionContext, KeybindingsManager } from "@earendil-works/pi-coding-agent";
 import type { TUI, EditorTheme } from "@earendil-works/pi-tui";
 
-const SPINNER_FRAMES = ["○○○○", "●○○○", "○●○○", "○○●○", "○○○●", "●●○○", "●○●○", "●○○●", "○●●○", "○●○●", "○○●●", "●●●○", "●●○●", "●○●●", "○●●●", "●●●●"];
-const SPINNER_MIN_INTERVAL_MS = 120;
-const SPINNER_MAX_INTERVAL_MS = 240;
-
 interface SpinnerOptions {
 	frames?: string[];
 	interval?: number | { min: number; max: number };
 	random?: boolean;
 }
+
+const DEFAULT_SPINNER_OPTIONS: Required<SpinnerOptions> = {
+	frames: ["○○○○", "●○○○", "○●○○", "○○●○", "○○○●", "●●○○", "●○●○", "●○○●", "○●●○", "○●○●", "○○●●", "●●●○", "●●○●", "●○●●", "○●●●", "●●●●"],
+	interval: { min: 120, max: 240 },
+	random: true,
+};
 
 class Spinner {
 	private tui: TUI | undefined;
@@ -28,9 +30,9 @@ class Spinner {
 	private timer: ReturnType<typeof setTimeout> | undefined;
 
 	constructor(options: SpinnerOptions = {}) {
-		this.frames = options.frames?.length ? options.frames : SPINNER_FRAMES;
-		this.interval = options.interval ?? { min: SPINNER_MIN_INTERVAL_MS, max: SPINNER_MAX_INTERVAL_MS };
-		this.random = options.random ?? true;
+		this.frames = options.frames?.length ? options.frames : DEFAULT_SPINNER_OPTIONS.frames;
+		this.interval = options.interval ?? DEFAULT_SPINNER_OPTIONS.interval;
+		this.random = options.random ?? DEFAULT_SPINNER_OPTIONS.random;
 	}
 
 	setTUI(tui: TUI): void {

@@ -9,30 +9,42 @@ type Side = "left" | "right";
 interface SplitLineOptions {
 	padding?: number;
 	gap?: number;
+	innerPadding?: number;
 	primarySide?: Side;
 	spacingChar?: string;
 	ellipsis?: string;
 }
 
+const DEFAULT_SPLIT_LINE_OPTIONS: Required<SplitLineOptions> = {
+	padding: 0,
+	gap: 2,
+	innerPadding: 0,
+	primarySide: "left",
+	spacingChar: " ",
+	ellipsis: "…",
+};
+
 /** Single-line component that places left and right text at opposite sides. */
 export class SplitLine implements Component {
 	private left: InlineText;
 	private right: InlineText;
+
 	private padding: number;
 	private gap: number;
 	private primarySide: Side;
 	private spacingChar: string;
 
 	constructor(left: InlineText | string, right: InlineText | string, options: SplitLineOptions = {}) {
-		const spacingChar = options.spacingChar ?? " ";
+		const spacingChar = options.spacingChar ?? DEFAULT_SPLIT_LINE_OPTIONS.spacingChar;
 		if (visibleWidth(spacingChar) !== 1) throw new Error("spacingChar must have a visible width of 1");
 
-		const inlineTextOptions = { padding: options.padding ?? 0, ellipsis: options.ellipsis ?? "…" };
+		const inlineTextOptions = { padding: options.innerPadding ?? DEFAULT_SPLIT_LINE_OPTIONS.innerPadding, ellipsis: options.ellipsis ?? DEFAULT_SPLIT_LINE_OPTIONS.ellipsis };
 		this.left = typeof left === "string" ? new InlineText(left, inlineTextOptions) : left;
 		this.right = typeof right === "string" ? new InlineText(right, inlineTextOptions) : right;
-		this.padding = options.padding ?? 0;
-		this.gap = options.gap ?? 2;
-		this.primarySide = options.primarySide ?? "left";
+
+		this.padding = options.padding ?? DEFAULT_SPLIT_LINE_OPTIONS.padding;
+		this.gap = options.gap ?? DEFAULT_SPLIT_LINE_OPTIONS.gap;
+		this.primarySide = options.primarySide ?? DEFAULT_SPLIT_LINE_OPTIONS.primarySide;
 		this.spacingChar = spacingChar;
 	}
 
