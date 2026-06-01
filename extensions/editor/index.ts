@@ -82,6 +82,7 @@ export default function (pi: ExtensionAPI) {
     if (config.editor === false) return;
 
     const editorConfig = typeof config.editor === "object" ? config.editor : {};
+
     spinner = new Spinner(editorConfig.spinner);
 
     ctx.ui.setWorkingVisible(false);
@@ -107,5 +108,6 @@ export default function (pi: ExtensionAPI) {
 
   pi.on("session_shutdown", () => {
     spinner?.dispose();
+    spinner = undefined;
   });
 }
