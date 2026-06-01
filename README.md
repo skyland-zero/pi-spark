@@ -6,7 +6,9 @@ A curated package of [pi](https://pi.dev/) extensions.
 
 - **Editor**: replaces the default editor with a compact working indicator and current model info.
 - **Footer**: shows the session info, cost, and context usage in one line, followed by extension statuses.
-- **Recap**: generates a short idle-session recap and exposes a `recap` command for manual refresh, inspired by [Claude Code's session recap](https://code.claude.com/docs/en/interactive-mode#session-recap).
+- **Recap**: generates a short idle-session recap and exposes a `/recap` command for manual generation, inspired by [Claude Code's session recap](https://code.claude.com/docs/en/interactive-mode#session-recap).
+
+![Screenshot](./assets/screenshot.png)
 
 ## Install
 
