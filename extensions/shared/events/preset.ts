@@ -1,12 +1,9 @@
-import Type from "typebox";
-import { Parse } from "typebox/value";
+import * as z from "zod";
 
-import type { Static } from "typebox";
-
-const PresetChangePayload = Type.Union([Type.String({ minLength: 1 }), Type.Undefined()]);
+const presetChangePayloadSchema = z.string().min(1).optional();
 
 export const PRESET_CHANGE = "preset:change" as const;
 
-export function parsePresetChange(data: unknown): Static<typeof PresetChangePayload> {
-  return Parse(PresetChangePayload, data);
+export function parsePresetChange(data: unknown): z.infer<typeof presetChangePayloadSchema> {
+  return presetChangePayloadSchema.parse(data);
 }

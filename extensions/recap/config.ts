@@ -1,13 +1,10 @@
-import Type from "typebox";
+import * as z from "zod";
 
-import { IdleTimeoutSchema } from "./idle";
-import { ModelSchema } from "./model";
+import { idleTimeoutSchema } from "./idle";
+import { modelSchema } from "./model";
 
-import type { Static } from "typebox";
-
-export const RecapConfigSchema = Type.Object({
-  idle: Type.Optional(IdleTimeoutSchema),
-  ...ModelSchema.properties,
+export const recapConfigSchema = modelSchema.extend({
+  idle: idleTimeoutSchema.optional(),
 });
 
-export type RecapConfig = Static<typeof RecapConfigSchema>;
+export type RecapConfig = z.infer<typeof recapConfigSchema>;

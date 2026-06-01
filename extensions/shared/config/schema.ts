@@ -1,20 +1,13 @@
-import Type from "typebox";
-import Value from "typebox/value";
+import * as z from "zod";
 
-import { EditorConfigSchema } from "../../editor/config";
-import { FooterConfigSchema } from "../../footer/config";
-import { RecapConfigSchema } from "../../recap/config";
+import { editorConfigSchema } from "../../editor/config";
+import { footerConfigSchema } from "../../footer/config";
+import { recapConfigSchema } from "../../recap/config";
 
-import type { Static } from "typebox";
-
-const UserConfigSchema = Type.Object({
-  editor: Type.Optional(Type.Union([Type.Boolean(), EditorConfigSchema])),
-  footer: Type.Optional(Type.Union([Type.Boolean(), FooterConfigSchema])),
-  recap: Type.Optional(Type.Union([Type.Boolean(), RecapConfigSchema])),
+export const userConfigSchema = z.object({
+  editor: z.union([z.boolean(), editorConfigSchema]).optional(),
+  footer: z.union([z.boolean(), footerConfigSchema]).optional(),
+  recap: z.union([z.boolean(), recapConfigSchema]).optional(),
 });
 
-export type UserConfig = Static<typeof UserConfigSchema>;
-
-export function resolveUserConfig(userConfig: unknown): UserConfig {
-  return Value.Parse(UserConfigSchema, userConfig);
-}
+export type UserConfig = z.infer<typeof userConfigSchema>;

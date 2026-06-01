@@ -1,12 +1,11 @@
-import Type from "typebox";
+import * as z from "zod";
 
-import type { Static } from "typebox";
+export const idleTimeoutSchema = z.number().min(5000);
 
-export const IdleTimeoutSchema = Type.Number({ minimum: 5000 });
-
-type IdleTimeout = Static<typeof IdleTimeoutSchema>;
+type IdleTimeout = z.infer<typeof idleTimeoutSchema>;
 type IdleHash = string | number | boolean;
 
+const DEFAULT_IDLE_MS = 3 * 60 * 1000;
 const POLL_MS = 1_000;
 
 export class IdleListener<T> {
@@ -22,7 +21,7 @@ export class IdleListener<T> {
   private enterCallbacks: Set<(ctx: T) => void> = new Set();
   private wakeCallbacks: Set<(ctx: T) => void> = new Set();
 
-  constructor(computeStateHash: (ctx: T) => IdleHash, idleMs: IdleTimeout = 60_000, pollMs: number = POLL_MS) {
+  constructor(computeStateHash: (ctx: T) => IdleHash, idleMs: IdleTimeout = DEFAULT_IDLE_MS, pollMs: number = POLL_MS) {
     this.computeStateHash = computeStateHash;
     this.idleMs = idleMs;
     this.pollMs = pollMs;

@@ -2,10 +2,9 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { getAgentDir } from "@earendil-works/pi-coding-agent";
 
-import { resolveUserConfig } from "./schema";
+import { userConfigSchema } from "./schema";
 
 import type { ExtensionContext } from "@earendil-works/pi-coding-agent";
-import type { TLocalizedValidationError } from "typebox/error";
 import type { UserConfig } from "./schema";
 
 type JsonValue = null | boolean | number | string | JsonValue[] | { [key: string]: JsonValue };
@@ -13,21 +12,16 @@ type ConfigValue = { [key: string]: JsonValue };
 
 export function loadConfig(ctx: ExtensionContext, fileName: string = "spark.json"): UserConfig {
   const userConfig = loadMergedJson(getConfigPaths(ctx.cwd, fileName));
+  const result = userConfigSchema.safeParse(userConfig ?? {});
+  if (result.success) return result.data;
 
-  try {
-    return resolveUserConfig(userConfig ?? {});
-  } catch (error) {
-    const errors = (error as any).cause?.errors as TLocalizedValidationError[];
+  const message = result.error.issues
+    .map((issue) => issue.path.length ? `${issue.path.join(".")}: ${issue.message}` : issue.message)
+    .join("; ");
 
-    const message = errors.map((error) => {
-      const allowedValues = (error.params as any)?.allowedValues;
-      return `${error.instancePath} ${error.message}${allowedValues ? ` (${allowedValues.join(", ")})` : ""}`;
-    }).join("; ");
+  ctx.ui.notify(`Invalid spark config: ${message}`, "error");
 
-    ctx.ui.notify(`Invalid spark config: ${message}`, "error");
-
-    return {};
-  }
+  return {};
 }
 
 function getConfigPaths(cwd: string, fileName: string): [globalPath: string, projectPath: string] {

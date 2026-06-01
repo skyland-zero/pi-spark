@@ -1,3 +1,3 @@
-import Type from "typebox";
+import * as z from "zod";
 
-export const FooterConfigSchema = Type.Object({});
+export const footerConfigSchema = z.object({});

@@ -1,7 +1,7 @@
-import Type from "typebox";
+import * as z from "zod";
 
-import { SpinnerPresetSchema } from "./spinner";
+import { spinnerPresetSchema } from "./spinner";
 
-export const EditorConfigSchema = Type.Object({
-  spinner: Type.Optional(SpinnerPresetSchema),
+export const editorConfigSchema = z.object({
+  spinner: spinnerPresetSchema.optional(),
 });

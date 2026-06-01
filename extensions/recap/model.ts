@@ -1,24 +1,21 @@
-import { clampThinkingLevel, StringEnum } from "@earendil-works/pi-ai";
-import Type from "typebox";
+import { clampThinkingLevel } from "@earendil-works/pi-ai";
+import * as z from "zod";
 
 import type { Api, Model, ModelThinkingLevel } from "@earendil-works/pi-ai";
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
-import type { Static, TUnsafe } from "typebox";
 
 const THINKING_LEVELS = ["off", "minimal", "low", "medium", "high", "xhigh"] as const satisfies readonly ModelThinkingLevel[];
-const DEFAULT_REASONING_LEVEL: ModelThinkingLevel = "off";
+const DEFAULT_THINKING_LEVEL: ModelThinkingLevel = "off";
 
-const ThinkingLevelSchema: TUnsafe<ModelThinkingLevel> = StringEnum(THINKING_LEVELS);
-
-export const ModelSchema = Type.Object({
-  provider: Type.Optional(Type.String()),
-  model: Type.Optional(Type.String()),
-  thinkingLevel: Type.Optional(ThinkingLevelSchema),
+export const modelSchema = z.object({
+  provider: z.string().optional(),
+  model: z.string().optional(),
+  thinkingLevel: z.enum(THINKING_LEVELS).optional(),
 });
 
-type ModelConfig = Static<typeof ModelSchema>;
+type ModelConfig = z.infer<typeof modelSchema>;
 
-export type RecapModel = {
+type RecapModel = {
   model: Model<Api>;
   thinkingLevel: ModelThinkingLevel;
   warning: string | undefined;
@@ -65,7 +62,7 @@ function resolveThinkingLevel(model: Model<Api>, requested: ModelThinkingLevel):
   const thinkingLevel = clampThinkingLevel(model, requested);
   if (thinkingLevel === requested) return { thinkingLevel };
 
-  const fallback = clampThinkingLevel(model, DEFAULT_REASONING_LEVEL);
+  const fallback = clampThinkingLevel(model, DEFAULT_THINKING_LEVEL);
   return {
     thinkingLevel: fallback,
     warning: `Thinking level ${requested} is not supported by ${model.provider}/${model.id}; using ${fallback}.`,

@@ -1,11 +1,10 @@
-import Type from "typebox";
+import * as z from "zod";
 
 import type { TUI } from "@earendil-works/pi-tui";
-import type { Static } from "typebox";
 
-export const SpinnerPresetSchema = Type.Enum(["lights", "dots"]);
+export const spinnerPresetSchema = z.enum(["lights", "dots"]);
 
-type SpinnerPreset = Static<typeof SpinnerPresetSchema>;
+type SpinnerPreset = z.infer<typeof spinnerPresetSchema>;
 
 interface SpinnerParams {
   frames: string[];
@@ -26,6 +25,8 @@ const SPINNER_PRESETS: Record<SpinnerPreset, SpinnerParams> = {
   },
 };
 
+const DEFAULT_SPINNER_PRESET = "lights";
+
 export class Spinner {
   private tui: TUI | undefined;
 
@@ -37,7 +38,7 @@ export class Spinner {
   private frameIndex: number = -1;
   private timer: ReturnType<typeof setTimeout> | undefined;
 
-  constructor(preset: SpinnerPreset = "lights") {
+  constructor(preset: SpinnerPreset = DEFAULT_SPINNER_PRESET) {
     const params = SPINNER_PRESETS[preset];
 
     this.frames = params.frames;
