@@ -60,3 +60,19 @@ Notes:
 - Presets can be selected with `/preset` or `/preset <key>`.
 - Cycle presets with `ctrl+super+p` and `ctrl+shift+super+p` (`super` is `command` on macOS).
 - The `recap.idle` value is in milliseconds and must be at least `5000`.
+
+## Recommended pi settings
+
+The Fullscreen extension pins the editor and footer to the bottom of the terminal. For the cleanest experience, pair it with pi's `terminal.clearOnShrink` setting, which clears empty rows when content shrinks so the pinned UI does not leave stale lines behind.
+
+Add this to `~/.pi/agent/settings.json` (global) or `.pi/settings.json` (project):
+
+```json
+{
+  "terminal": {
+    "clearOnShrink": true
+  }
+}
+```
+
+This setting defaults to `false` because it can cause flicker in some terminals. With Fullscreen enabled the trade-off is usually worth it.
