@@ -1,7 +1,7 @@
 import { completeSimple } from "@earendil-works/pi-ai";
 import { convertToLlm, serializeConversation } from "@earendil-works/pi-coding-agent";
 
-import { resolveRecapModel } from "./model";
+import { resolveRecapModelSettings } from "./model";
 import { clearRecapWidget, setRecapLoadingWidget, setRecapTextWidget } from "./widget";
 import { sanitizeText } from "../shared/format";
 
@@ -40,25 +40,27 @@ export class RecapManager {
     this.inflight = controller;
 
     try {
-      const recapModel = await resolveRecapModel(this.pi, ctx, this.config);
-      if (controller.signal.aborted || this.inflight !== controller || !recapModel) return;
+      const recapModelSettings = await resolveRecapModelSettings(this.pi, ctx, this.config);
+      if (controller.signal.aborted || this.inflight !== controller || !recapModelSettings) return;
 
-      setRecapLoadingWidget(ctx, recapModel.warning);
+      const { model, thinkingLevel, warning } = recapModelSettings;
+
+      setRecapLoadingWidget(ctx, warning);
       this.active = false;
 
-      const result = await this.generate(ctx, recapModel.model, recapModel.thinkingLevel, controller.signal);
+      const result = await this.generate(ctx, model, thinkingLevel, controller.signal);
       if (controller.signal.aborted || this.inflight !== controller) return;
       if (!result.content) {
         clearRecapWidget(ctx);
         return;
       }
 
-      setRecapTextWidget(ctx, result.content, recapModel.warning);
+      setRecapTextWidget(ctx, result.content, warning);
       this.active = true;
 
       this.pi.appendEntry("recap", {
-        provider: recapModel.model.provider,
-        model: recapModel.model.id,
+        provider: model.provider,
+        model: model.id,
         usage: result.usage,
         content: result.content,
       });
