@@ -4,7 +4,7 @@ import { Spinner } from "./spinner";
 import { SplitLine } from "../shared/components/split-line";
 import { loadConfig } from "../shared/config";
 import { autoCollectEvents, PRESET_CHANGE, parsePresetChange } from "../shared/events";
-import { formatModel, formatRunningTools } from "../shared/format";
+import { formatModel } from "../shared/format";
 
 import type { ExtensionAPI, ExtensionContext, KeybindingsManager } from "@earendil-works/pi-coding-agent";
 import type { TUI, EditorTheme } from "@earendil-works/pi-tui";
@@ -29,12 +29,12 @@ class Editor extends CustomEditor {
     this.slots = { modelBefore: undefined };
   }
 
-  setWorkingMessage(message: string | undefined): void {
+  setWorkingMessage(message?: string | undefined): void {
     this.workingMessage = message;
     this.tui.requestRender();
   }
 
-  setSlot(slot: keyof typeof this.slots, value: string | undefined): void {
+  setSlot(slot: keyof typeof this.slots, value?: string | undefined): void {
     this.slots[slot] = value;
     this.tui.requestRender();
   }
@@ -111,7 +111,7 @@ export default function (pi: ExtensionAPI) {
 
   pi.on("agent_start", () => {
     runningToolCount = 0;
-    editor?.setWorkingMessage("Working");
+    editor?.setWorkingMessage();
     spinner?.start();
   });
 
@@ -121,36 +121,43 @@ export default function (pi: ExtensionAPI) {
     switch (event.assistantMessageEvent.type) {
       case "thinking_start":
       case "thinking_delta":
+      case "thinking_end":
         editor?.setWorkingMessage("Thinking");
         break;
       case "text_start":
       case "text_delta":
+      case "text_end":
         editor?.setWorkingMessage("Streaming");
         break;
       case "toolcall_start":
       case "toolcall_delta":
       case "toolcall_end":
-        editor?.setWorkingMessage("Preparing tools");
+        editor?.setWorkingMessage("Running tools");
         break;
       default:
-        editor?.setWorkingMessage("Working");
+        editor?.setWorkingMessage();
         break;
     }
   });
 
   pi.on("tool_execution_start", () => {
     runningToolCount += 1;
-    editor?.setWorkingMessage(formatRunningTools(runningToolCount));
+    editor?.setWorkingMessage("Running tools");
+  });
+
+  pi.on("tool_call", () => {
+    if (runningToolCount === 0) runningToolCount = 1;
+    editor?.setWorkingMessage("Running tools");
   });
 
   pi.on("tool_execution_end", () => {
     runningToolCount = Math.max(0, runningToolCount - 1);
-    editor?.setWorkingMessage(runningToolCount > 0 ? formatRunningTools(runningToolCount) : "Working");
+    editor?.setWorkingMessage(runningToolCount > 0 ? "Running tools" : undefined);
   });
 
   pi.on("agent_end", () => {
     runningToolCount = 0;
-    editor?.setWorkingMessage(undefined);
+    editor?.setWorkingMessage();
     spinner?.stop();
   });
 
