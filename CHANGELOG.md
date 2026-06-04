@@ -21,3 +21,14 @@
 ### Bug Fixes
 
 * **editor:** add tildes spinner preset ([523f6fc](https://github.com/zlliang/pi-spark/commit/523f6fcd982455fbfe202982c5dfb7a62590b6dd))
+
+## [0.1.1](https://github.com/zlliang/pi-spark/compare/v0.1.0...v0.1.1) (2026-06-02)
+
+
+### Miscellaneous Chores
+
+* release 0.1.1 ([09bfd96](https://github.com/zlliang/pi-spark/commit/09bfd96eec21dc9467bbbf10946bc5bb9cf858f7))
+
+## [0.1.0](https://github.com/zlliang/pi-spark/releases/tag/v0.1.0) (2026-06-02)
+
+Initial release of pi-spark, including the Editor, Footer, Fullscreen, Presets, and Recap extensions, plus shared TUI components and spark configuration support.
