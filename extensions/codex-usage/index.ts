@@ -5,13 +5,11 @@ import { isUsage } from "../shared/usage";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import type { AgentMessage } from "@earendil-works/pi-agent-core";
 
-function hasCostedUsage(messages: AgentMessage[]): boolean {
-  return messages.some((message) => {
-    const usage = (message as { usage?: unknown }).usage;
-    if (!isUsage(usage)) return false;
+function hasCost(message: AgentMessage): boolean {
+  const usage = (message as { usage?: unknown }).usage;
+  if (!isUsage(usage)) return false;
 
-    return usage.cost.total > 0 || usage.input > 0 || usage.output > 0;
-  });
+  return usage.cost.total > 0 || usage.input > 0 || usage.output > 0;
 }
 
 export default function (pi: ExtensionAPI) {
@@ -31,8 +29,18 @@ export default function (pi: ExtensionAPI) {
     codexUsageManager?.refresh(ctx);
   });
 
-  pi.on("agent_end", (event, ctx) => {
-    if (!hasCostedUsage(event.messages)) return;
+  pi.on("turn_end", (event, ctx) => {
+    if (!hasCost(event.message)) return;
+
+    codexUsageManager?.refresh(ctx);
+  });
+
+  pi.on("session_compact", (_event, ctx) => {
+    codexUsageManager?.refresh(ctx);
+  });
+
+  pi.on("session_tree", (event, ctx) => {
+    if (!event.summaryEntry) return;
 
     codexUsageManager?.refresh(ctx);
   });
