@@ -33,6 +33,8 @@ pi install git:github.com/zlliang/pi-spark
 
 Spark reads config from `~/.pi/agent/spark.json` and from the current project’s `.pi/spark.json`. Project config overrides matching global fields.
 
+All extensions are enabled by default. Set a specific extension to `false` to disable it, for example, `"footer": false` disables the footer extension.
+
 Example:
 
 ```json
@@ -41,7 +43,6 @@ Example:
     "spinner": "dots"
   },
   "footer": false,
-  "fullscreen": true,
   "presets": {
     "claude-opus": {
       "model": "claude-opus-4-8",
@@ -59,30 +60,25 @@ Example:
     "model": "gpt-5.4-mini",
     "provider": "openai-codex",
     "thinkingLevel": "off"
-  },
-  "setSessionName": true
+  }
 }
 ```
 
 ### Editor
 
-- Set `editor` to `false` to keep pi's default editor.
-- When enabled, `editor.spinner` controls the working indicator style and can be `dots`, `lights`, or `tildes`.
+- `editor.spinner` controls the working indicator style and can be `dots`, `lights`, or `tildes`.
 
 ### Footer
 
-- Set `footer` to `false` to keep pi's default footer.
-- When enabled, pi-spark replaces the footer with a compact one-line view of session metadata, extension statuses, cost, and context usage.
+- pi-spark replaces the footer with a compact one-line view of session metadata, extension statuses, cost, and context usage.
 
 ### Fullscreen
 
-- Set `fullscreen` to `false` to disable full-screen behavior.
-- When enabled, pi-spark clears the screen and scrollback at session start and exit, pins the editor and footer to the bottom, and enables pi's `clearOnShrink` behavior programmatically so pinned UI stays aligned after taller components close.
+- pi-spark clears the screen and scrollback at session start and exit, pins the editor and footer to the bottom, and enables pi's `clearOnShrink` behavior programmatically so pinned UI stays aligned after taller components close.
 
 ### Presets
 
-- Set `presets` to `false` to disable preset switching.
-- When enabled, each key under `presets` defines a named model preset with `provider`, `model`, and optional `thinkingLevel` fields.
+- Each key under `presets` defines a named model preset with `provider`, `model`, and optional `thinkingLevel` fields.
 
 Use presets in these ways:
 
@@ -92,11 +88,9 @@ Use presets in these ways:
 
 ### Recap
 
-- Set `recap` to `false` to disable idle recaps and the `/recap` command.
-- When enabled, pi-spark can generate a short recap after the session has been idle or when you run `/recap` manually.
+- pi-spark can generate a short recap after the session has been idle or when you run `/recap` manually.
 - The `recap.idle` value is in milliseconds and must be at least `5000`. The recap model can be customized with `provider`, `model`, and `thinkingLevel`.
 
 ### Set session name
 
-- Set `setSessionName` to `false` to disable the `set_session_name` tool.
-- When enabled, the agent can set or refresh the current session's display name and optionally give a reason.
+- The agent can set or refresh the current session's display name and optionally give a reason.
