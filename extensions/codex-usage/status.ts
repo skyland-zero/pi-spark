@@ -19,7 +19,7 @@ export function renderUsage(theme: Theme, usage: CodexUsage): string {
 
 /** Render a footer status string for a usage fetch error. */
 export function renderError(theme: Theme, message: string): string {
-  return `${theme.fg("dim", LABEL)} ${theme.fg("warning", `usage unavailable: ${message}`)}`;
+  return theme.fg("error", `${LABEL} usage unavailable: ${message}`);
 }
 
 function renderLane(theme: Theme, label: string, percent: number | undefined): string {

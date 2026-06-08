@@ -47,7 +47,7 @@ export async function fetchCodexUsage(token: string, accountId?: string, parentS
   if (accountId) headers["ChatGPT-Account-Id"] = accountId;
 
   const response = await fetch(USAGE_URL, { method: "GET", headers, signal: AbortSignal.any(signals) });
-  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  if (!response.ok) throw new Error("request failed");
 
   return normalizeUsage((await response.json()) as CodexUsageResponse);
 }
