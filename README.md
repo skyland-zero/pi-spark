@@ -58,8 +58,8 @@ Example:
   },
   "recap": {
     "idle": "5m",
-    "model": "gpt-5.4-mini",
     "provider": "openai-codex",
+    "model": "gpt-5.4-mini",
     "thinkingLevel": "off"
   }
 }
