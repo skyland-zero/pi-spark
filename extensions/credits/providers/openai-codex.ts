@@ -1,3 +1,5 @@
+import { toNumber } from "./utils";
+
 import type { ExtensionContext } from "@earendil-works/pi-coding-agent";
 import type { Credits, CreditsProvider } from "../types";
 
@@ -25,12 +27,9 @@ export function getAccountId(ctx: ExtensionContext): string | undefined {
   return typeof accountId === "string" && accountId.trim() ? accountId.trim() : undefined;
 }
 
-function parseUsedPercent(window: CodexRateWindow | null | undefined): number | undefined {
-  const raw = window?.used_percent;
-  if (raw === undefined || raw === null) return undefined;
-
-  const value = typeof raw === "number" ? raw : Number(raw);
-  return Number.isFinite(value) ? Math.min(100, Math.max(0, value)) : undefined;
+function parseUsedPercent(window?: CodexRateWindow | null): number | undefined {
+  const value = toNumber(window?.used_percent);
+  return typeof value === "number" ? Math.min(100, Math.max(0, value)) : undefined;
 }
 
 export const openaiCodexProvider: CreditsProvider = {
