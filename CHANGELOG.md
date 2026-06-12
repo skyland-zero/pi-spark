@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.2](https://github.com/zlliang/pi-spark/compare/v0.9.1...v0.9.2) (2026-06-12)
+
+
+### Bug Fixes
+
+* **models:** show expand hint in model tool call ([a7ac029](https://github.com/zlliang/pi-spark/commit/a7ac02943e0621e04093c5cc0a81a192fe440801))
+
 ## [0.9.1](https://github.com/zlliang/pi-spark/compare/v0.9.0...v0.9.1) (2026-06-12)
 
 
