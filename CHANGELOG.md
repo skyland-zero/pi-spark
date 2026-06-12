@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.5](https://github.com/zlliang/pi-spark/compare/v0.9.4...v0.9.5) (2026-06-12)
+
+
+### Bug Fixes
+
+* **models:** keep unavailable model labels visible ([feab815](https://github.com/zlliang/pi-spark/commit/feab8159210033ad362a4951e835247e28325063))
+
 ## [0.9.4](https://github.com/zlliang/pi-spark/compare/v0.9.3...v0.9.4) (2026-06-12)
 
 
