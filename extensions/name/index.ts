@@ -17,33 +17,29 @@ export default function (pi: ExtensionAPI) {
       name: "name",
       label: "name",
       description:
-        "Set or refresh the current session's concise name, shown in the session selector " +
-        "instead of the first-message preview.",
-      promptSnippet: "Set or refresh the current session's concise name",
+        "Name or rename the current session. The name is a concise label shown in the session " +
+        "selector instead of the first-message preview.",
+      promptSnippet: "Name or rename the current session",
       promptGuidelines: [
-        "Use name when the session would benefit from a concise, recognizable name, especially after a long, vague, or pasted opening prompt.",
-        "Use name to refresh the session's name only after a substantial shift in the conversation's focus; do not rename for minor follow-ups.",
-        "Include a concise reason for name when it would help explain why the name identifies the session.",
+        "Use the name tool when the session needs a concise, recognizable label, especially after a long, vague, or pasted opening prompt.",
+        "Use the name tool to rename the session only after a substantial shift in the conversation's focus, not for minor follow-ups.",
+        "Use the name tool with a reason when it helps explain why the name identifies the session.",
       ],
       parameters: Type.Object({
         name: Type.String({
           minLength: 1,
           maxLength: 120,
           description:
-            "Concise session name. Use a short, recognizable phrase in sentence case, " +
-            "ideally <= 72 characters. Do not use surrounding quotes, trailing punctuation, or " +
-            "generic prefixes like \"Chat about\". Examples: \"Refactor auth module\", " +
-            "\"Debug flaky CI pipeline\", \"Draft Q3 planning doc\".",
+            "Use a short, recognizable phrase in sentence case, ideally <= 72 characters " +
+            "(e.g., \"Refactor auth module\", \"Debug flaky CI pipeline\"). Do not use " +
+            "surrounding quotes, trailing punctuation, or generic prefixes like \"Chat about\".",
         }),
         reason: Type.Optional(Type.String({
           maxLength: 240,
           description:
-            "Optional concise reason for naming or renaming the current session. Explain what " +
-            "made the name useful, such as a long pasted prompt, ambiguous first message, task " +
-            "handoff, or substantial topic shift. Write a complete sentence, and keep it brief " +
-            "and user-facing. Examples: \"The long pasted prompt needed a stable label.\", " +
-            "\"The focus shifted from debugging to README updates.\", " +
-            "\"The task migrated from a previous session.\"",
+            "Explain briefly why the session was named or renamed, such as a long pasted " +
+            "prompt, an ambiguous first message, or a topic shift. Write one user-facing " +
+            "sentence (e.g., \"The focus shifted from debugging to README updates.\").",
         })),
       }),
       renderCall(args, theme) {
@@ -70,12 +66,12 @@ export default function (pi: ExtensionAPI) {
       },
       async execute(_toolCallId, params, _signal, _onUpdate, _ctx) {
         const name = sanitizeText(params.name);
-        if (!name) throw new Error("Session name was empty after normalization; provide a short, non-empty phrase");
+        if (!name) throw new Error("Session name was empty after normalization; provide a short, non-empty phrase.");
 
         const previous = pi.getSessionName() ?? null;
         if (previous === name) {
           return {
-            content: [{ type: "text", text: `Session is already named "${name}"; no change` }],
+            content: [{ type: "text", text: `Session is already named "${name}". Nothing changed.` }],
             details: { changed: false, previous },
           };
         }
@@ -83,7 +79,7 @@ export default function (pi: ExtensionAPI) {
         pi.setSessionName(name);
 
         return {
-          content: [{ type: "text", text: `${previous ? `Renamed session from "${previous}" to "${name}"` : `Named session "${name}"`}` }],
+          content: [{ type: "text", text: `${previous ? `Renamed session from "${previous}" to "${name}".` : `Named session "${name}".`}` }],
           details: { changed: true, previous },
         };
       },
