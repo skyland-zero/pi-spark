@@ -1,9 +1,6 @@
 {
   "packages": [
-    {
-      "source": "npm:pi-spark",
-      "extensions": []
-    },
-    ".."
+    { "source": "npm:pi-spark", "extensions": [] },
+    { "source": ".." }
   ]
 }
