@@ -1,14 +1,8 @@
 {
   "packages": [
-    {
-      "source": "npm:pi-credits",
-      "extensions": []
-    },
-    {
-      "source": "npm:pi-spark",
-      "extensions": []
-    },
-    "packages/pi-credits",
-    "packages/pi-spark"
+    { "source": "npm:pi-credits", "extensions": [] },
+    { "source": "../packages/pi-credits" },
+    { "source": "npm:pi-spark", "extensions": [] },
+    { "source": "../packages/pi-spark" }
   ]
 }
