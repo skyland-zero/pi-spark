@@ -11,6 +11,10 @@
     "url": "git+https://github.com/zlliang/pi-packages.git",
     "directory": "packages/pi-spark"
   },
+  "homepage": "https://github.com/zlliang/pi-packages/tree/main/packages/pi-spark#readme",
+  "bugs": {
+    "url": "https://github.com/zlliang/pi-packages/issues"
+  },
   "license": "MIT",
   "type": "module",
   "files": [
