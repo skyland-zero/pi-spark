@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.10.0](https://github.com/zlliang/pi-spark/compare/v0.9.5...v0.10.0) (2026-06-13)
+
+
+### ⚠ BREAKING CHANGES
+
+* **models:** the model tool's "current" action is renamed to "active", and the scope/provider/model params are replaced by "query".
+
+### Features
+
+* **models:** filter model lists with Liqe queries ([877479b](https://github.com/zlliang/pi-spark/commit/877479b51a715b7a5a05381b207ecd03837e433d))
+
+
+### Styles
+
+* **name:** use complete sentences in tool prose ([3430899](https://github.com/zlliang/pi-spark/commit/343089946f685b70c1bcda0291cf511f536a0711))
+
 ## [0.9.5](https://github.com/zlliang/pi-spark/compare/v0.9.4...v0.9.5) (2026-06-12)
 
 
