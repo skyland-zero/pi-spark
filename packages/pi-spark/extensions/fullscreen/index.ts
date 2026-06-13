@@ -37,7 +37,6 @@ export default function (pi: ExtensionAPI) {
   let tui: TUI | undefined;
   let enabled = false;
   let pendingClear = false;
-  let previousClearOnShrink: boolean | undefined;
 
   pi.on("session_start", (_event, ctx) => {
     if (!ctx.hasUI) return;
@@ -54,18 +53,8 @@ export default function (pi: ExtensionAPI) {
     ctx.ui.setWidget(WIDGET_KEY, (capturedTui) => {
       tui = capturedTui;
 
-      // Enable `clearOnShrink`, but defer it to a macrotask. On `/reload`, pi resets
-      // `clearOnShrink` to the settings value right after `session_start`, inside the reload's
-      // microtask continuation. A `setTimeout` callback runs only after that microtask queue
-      // drains, so it lands last and sticks. `queueMicrotask` (or a synchronous call) would run
-      // before the reset and get clobbered.
-      previousClearOnShrink ??= capturedTui.getClearOnShrink();
-      setTimeout(() => capturedTui.setClearOnShrink(true));
-
-      // Clear the screen once on entry. `session_start` has no TUI to repaint with, and a
-      // synchronous repaint here is too early (the filler isn't in the render tree until
-      // `setWidget` returns), so defer to a microtask. `pendingClear` limits this to the
-      // `session_start`-triggered mount rather than every widget rebuild.
+      // Defer the entry clear to a microtask: the filler isn't in the render tree until
+      // `setWidget` returns, and `session_start` has no TUI to repaint with yet.
       if (pendingClear) {
         pendingClear = false;
         queueMicrotask(() => capturedTui.requestRender(true));
@@ -78,19 +67,11 @@ export default function (pi: ExtensionAPI) {
   pi.on("session_shutdown", (event, ctx) => {
     if (!enabled) return;
 
-    // Restore `clearOnShrink` to its pre-fullscreen value.
-    if (previousClearOnShrink !== undefined) {
-      tui?.setClearOnShrink(previousClearOnShrink);
-      previousClearOnShrink = undefined;
-    }
-
     if (event.reason === "quit" && tui) {
-      // On normal interactive quit, shutdown handlers run after pi stops the TUI, so
-      // `requestRender(true)` can no longer repaint. Write the clear sequence directly: clear
-      // screen, move home, then clear scrollback.
+      // The TUI is already stopped here, so write the clear sequence directly instead of
+      // repainting: clear screen, home, clear scrollback.
       tui.terminal.write("\x1b[2J\x1b[H\x1b[3J");
 
-      // Leave one concise line after the cleared session.
       const theme = ctx.ui.theme;
       const exitMessage = `${theme.bold(theme.fg("accent", "pi"))} ${theme.fg("dim", `v${VERSION} exited`)}`;
       const sessionText = getSessionDisplayText(ctx, theme);

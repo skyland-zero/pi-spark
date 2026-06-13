@@ -17,17 +17,19 @@ export class BottomFiller implements Component {
   }
 
   render(width: number): string[] {
-    // The TUI renders this component as part of its child tree, so measuring the
-    // siblings re-enters this render. Guard against the recursion and count our
-    // own contribution as zero lines while measuring.
+    // Guard against re-entrancy: measuring the siblings below renders this component again.
     if (this.measuring) return [];
     this.measuring = true;
+
+    // Re-assert `clearOnShrink` every render pass; the TUI reads it after `render()` returns,
+    // so this wins deterministically over pi's reset to the settings value on startup/reload.
+    this.tui.setClearOnShrink(true);
 
     const rows = this.tui.terminal.rows;
     let others = 0;
     for (const child of this.tui.children) {
       others += child.render(width).length;
-      if (others >= rows) break; // content already fills the screen
+      if (others >= rows) break;
     }
 
     this.measuring = false;
