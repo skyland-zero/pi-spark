@@ -37,7 +37,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
         with:
           run_install: false
 
@@ -51,5 +51,5 @@ jobs:
 
       - run: pnpm typecheck
 
-      - run: pnpm publish --provenance --access public
+      - run: pnpm publish --provenance
         working-directory: ${{ matrix.path }}
