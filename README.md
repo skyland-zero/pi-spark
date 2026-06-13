@@ -2,7 +2,7 @@
 
 # pi-spark
 
-[Pi](https://pi.dev/) extensions that polish the daily experience.
+[Pi](https://pi.dev/) package that polishes your daily experience and keeps you at the frontier of agentic workflows.
 
 ## Extensions
 
