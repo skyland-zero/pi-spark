@@ -4,10 +4,10 @@ import { creditsConfigSchema } from "../features/credits/config";
 import { editorConfigSchema } from "../features/editor/config";
 import { footerConfigSchema } from "../features/footer/config";
 import { fullscreenConfigSchema } from "../features/fullscreen/config";
-import { modelConfigSchema } from "../features/model/config";
-import { nameConfigSchema } from "../features/name/config";
+import { piConfigSchema } from "../features/pi/config";
 import { presetsConfigSchema } from "../features/presets/config";
 import { recapConfigSchema } from "../features/recap/config";
+import { webConfigSchema } from "../features/web/config";
 
 const disabled = z.literal(false);
 
@@ -20,10 +20,10 @@ export const sparkConfigSchema = z.object({
   editor: editorConfigSchema.or(disabled).default({}),
   footer: footerConfigSchema.or(disabled).default({}),
   fullscreen: fullscreenConfigSchema.or(disabled).default({}),
-  model: modelConfigSchema.or(disabled).default({}),
-  name: nameConfigSchema.or(disabled).default({}),
+  pi: piConfigSchema.or(disabled).default({}),
   presets: presetsConfigSchema.or(disabled).default({}),
   recap: recapConfigSchema.or(disabled).default({}),
+  web: webConfigSchema.or(disabled).default({}),
 });
 
 /** Resolved config for every feature; `false` means the feature is disabled. */

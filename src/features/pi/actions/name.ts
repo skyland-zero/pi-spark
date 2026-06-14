@@ -1,0 +1,76 @@
+import { Container, Spacer, Text } from "@earendil-works/pi-tui";
+import { Type } from "typebox";
+
+import { sanitizeText } from "../../../utils/format";
+import { defineAction } from "../registry";
+
+interface NameDetails {
+  action: "name";
+  changed: boolean;
+  previous: string | null;
+}
+
+export const nameAction = defineAction({
+  name: "name",
+  summary: "sets or updates the current session's name",
+  fields: {
+    name: Type.String({
+      minLength: 1,
+      maxLength: 120,
+      description:
+        "For \"name\": Use a short, recognizable phrase in sentence case, ideally <= 72 characters " +
+        "(e.g., \"Refactor auth module\", \"Debug flaky CI pipeline\"). Do not use " +
+        "surrounding quotes, trailing punctuation, or generic prefixes like \"Chat about\".",
+    }),
+    reason: Type.Optional(Type.String({
+      maxLength: 240,
+      description:
+        "For \"name\": Explain briefly why the session was named or renamed, such as a long pasted " +
+        "prompt, an ambiguous first message, or a topic shift. Write one user-facing " +
+        "sentence (e.g., \"The focus shifted from debugging to README updates.\").",
+    })),
+  },
+  required: ["name"],
+  promptGuidelines: [
+    "Use the pi tool's \"name\" action to give the current session a concise, recognizable name, especially after a long, vague, or pasted opening prompt, or after a substantial shift in the conversation's focus.",
+  ],
+  renderCall(args, theme) {
+    const name = sanitizeText(args.name ?? "");
+    const reason = sanitizeText(args.reason ?? "");
+
+    const container = new Container();
+    container.addChild(new Text(`${theme.bold(theme.fg("toolTitle", "pi"))} ${theme.fg("accent", "name")} ${theme.fg("muted", name)}`, 0, 0));
+
+    if (reason) {
+      container.addChild(new Spacer(1));
+      container.addChild(new Text(theme.fg("muted", reason), 0, 0));
+    }
+
+    return container;
+  },
+  renderResult() {
+    // "name" has no success UI; errors are rendered by the registry's fallback.
+    return new Text("", 0, 0);
+  },
+  async execute(args, { pi }) {
+    const name = sanitizeText(args.name);
+    if (!name) throw new Error("Session name was empty after normalization; provide a short, non-empty phrase.");
+
+    const previous = pi.getSessionName() ?? null;
+    if (previous === name) {
+      const details: NameDetails = { action: "name", changed: false, previous };
+      return {
+        content: [{ type: "text", text: `Session is already named "${name}". Nothing changed.` }],
+        details,
+      };
+    }
+
+    pi.setSessionName(name);
+
+    const details: NameDetails = { action: "name", changed: true, previous };
+    return {
+      content: [{ type: "text", text: previous ? `Renamed session from "${previous}" to "${name}".` : `Named session "${name}".` }],
+      details,
+    };
+  },
+});

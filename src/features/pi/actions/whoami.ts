@@ -1,0 +1,60 @@
+import { Container, Spacer, Text } from "@earendil-works/pi-tui";
+
+import { defineAction } from "../registry";
+import { toMetadata, toModelRow } from "../model";
+
+import type { ModelThinkingLevel } from "@earendil-works/pi-ai";
+import type { ModelMetadata } from "../model";
+
+interface WhoamiDetails {
+  action: "whoami";
+  sessionName: string | null;
+  model: ModelMetadata | null;
+  thinkingLevel: ModelThinkingLevel;
+}
+
+export const whoamiAction = defineAction({
+  name: "whoami",
+  summary: "shows the current pi state with session name, active model with metadata, and thinking level",
+  fields: {},
+  promptGuidelines: [
+    "Use the pi tool's \"whoami\" action when you need the current session's name or the active model and thinking level.",
+  ],
+  renderResult(result, _options, theme) {
+    const details = result.details as WhoamiDetails | undefined;
+
+    const container = new Container();
+    container.addChild(new Spacer(1));
+
+    if (!details) {
+      container.addChild(new Text(theme.fg("muted", "No pi state available."), 0, 0));
+      return container;
+    }
+
+    const sessionName = details.sessionName ?? theme.fg("dim", "(unnamed)");
+    container.addChild(new Text(`${theme.fg("muted", "session")}  ${theme.fg("accent", sessionName)}`, 0, 0));
+
+    if (details.model) {
+      const row = toModelRow(details.model, details.thinkingLevel);
+      const cells = [row.label, row.cost, row.context].join("  ");
+      container.addChild(new Text(`${theme.fg("muted", "model")}    ${theme.fg("muted", cells)}`, 0, 0));
+    } else {
+      container.addChild(new Text(`${theme.fg("muted", "model")}    ${theme.fg("dim", "(no-model)")}`, 0, 0));
+    }
+
+    return container;
+  },
+  async execute(_args, { pi, ctx }) {
+    const state: WhoamiDetails = {
+      action: "whoami",
+      sessionName: pi.getSessionName() ?? null,
+      model: ctx.model ? toMetadata(ctx.model, true) : null,
+      thinkingLevel: pi.getThinkingLevel(),
+    };
+
+    return {
+      content: [{ type: "text", text: JSON.stringify(state) }],
+      details: state,
+    };
+  },
+});

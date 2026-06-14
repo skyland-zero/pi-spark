@@ -16,10 +16,10 @@ const DISABLED_CONFIG: SparkConfig = Object.freeze({
   editor: false,
   footer: false,
   fullscreen: false,
-  model: false,
-  name: false,
+  pi: false,
   presets: false,
   recap: false,
+  web: false,
 });
 
 const cache = new Map<string, SparkConfig>();

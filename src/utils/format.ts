@@ -1,10 +1,10 @@
 import { isAbsolute, relative, resolve, sep } from "node:path";
 
-import type { Provider } from "@earendil-works/pi-ai";
+import type { ImageContent, Provider, TextContent } from "@earendil-works/pi-ai";
 import type { ContextUsage } from "@earendil-works/pi-coding-agent";
 
 export function formatModel(provider?: Provider, model?: string, thinkingLevel?: string): string {
-  return provider && model ? `${provider}/${model}${thinkingLevel ? `:${thinkingLevel}` : ""}` : "no-model";
+  return provider && model ? `${provider}/${model}${thinkingLevel ? `:${thinkingLevel}` : ""}` : "(no-model)";
 }
 
 export function formatTokens(count: number): string {
@@ -60,6 +60,14 @@ export function sanitizeText(text: string): string {
     .replace(/[\r\n\t]/g, " ")
     .replace(/ +/g, " ")
     .trim();
+}
+
+/** Join the text blocks of tool result content into a single newline-separated string. */
+export function joinTextContent(content: (TextContent | ImageContent)[]): string {
+  return content
+    .filter((block) => block.type === "text")
+    .map((block) => block.text)
+    .join("\n");
 }
 
 /** Coerce a possibly-stringified numeric value to a finite number, or `undefined`. */

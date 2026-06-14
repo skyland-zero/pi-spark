@@ -47,12 +47,20 @@ pi-spark generates a short recap of the current session after it goes idle, or o
 
 ![Recap](./assets/screenshot-recap.png)
 
-### Agent tools: `name` and `model`
+### Agent tools: `pi` and `web`
 
-pi-spark provides the pi coding agent with tools to inspect and manipulate itself. Currently, `name` and `model` tools are included.
+pi-spark adds two agent tools:
 
+The `pi` tool lets the pi coding agent inspect and manipulate itself (~740 tokens).
+
+- `models` lists and searches the model catalog.
 - `name` sets or updates the current session's name.
-- `model` shows the active model or lists pi models.
+- `whoami` shows the current pi state with session name, active model with metadata, and thinking level.
+
+The `web` tool gives the agent live web access, backed by the free [Exa MCP](https://exa.ai/mcp) (~350 tokens). No separate MCP setup or API key is needed.
+
+- `search` finds current information across the web and returns clean, ready-to-use content.
+- `fetch` reads the full content of known URLs as clean markdown, and can batch several URLs in one call.
 
 ![Agent tools](./assets/screenshot-tools.png)
 
@@ -99,10 +107,10 @@ All fields are optional. Each top-level feature runs with the defaults below unl
 | `editor` | `EditorConfig` | Shows a working indicator and the current model on the editor's top border. |
 | `footer` | `{}` | Shows session info, extension statuses, cost, and context usage on one line. |
 | `fullscreen` | `{}` | Clears the screen and scrollback on start and exit, and pins the editor and footer to the bottom. |
-| `model` | `{}` | Exposes the `model` agent tool. |
-| `name` | `{}` | Exposes the `name` agent tool. |
+| `pi` | `{}` | Exposes the `pi` agent tool (`models`, `name`, `whoami` actions). |
 | `presets` | `{ [name]: Preset }` | Defines named model presets, keyed by name. |
 | `recap` | `RecapConfig` | Generates a session recap when idle or on demand. |
+| `web` | `{}` | Exposes the `web` agent tool (`search`, `fetch` actions) via Exa's hosted MCP server. |
 
 #### `EditorConfig`
 
@@ -121,8 +129,8 @@ Each preset must set all three fields.
 
 | Field | Value | Description |
 | --- | --- | --- |
-| `provider` | string | Provider id, e.g. `anthropic`. |
-| `model` | string | Model id, e.g. `claude-opus-4-8`. |
+| `provider` | string | Provider ID, e.g., `anthropic`. |
+| `model` | string | Model ID, e.g., `claude-opus-4-8`. |
 | `thinkingLevel` | `off`, `minimal`, `low`, `medium`, `high`, `xhigh` | Thinking level for the preset. |
 
 #### `RecapConfig`
@@ -131,9 +139,9 @@ All fields are optional, including `thinkingLevel`.
 
 | Field | Value | Description |
 | --- | --- | --- |
-| `idle` | number (ms) or duration string | How long the session must stay idle before a recap is generated. Accepts a millisecond number or a [vercel/ms](https://github.com/vercel/ms) string (e.g. `"3m"`); minimum 5000 ms, defaults to 3 minutes. |
-| `provider` | string | Provider id for the recap model. |
-| `model` | string | Model id for the recap model. |
+| `idle` | number (ms) or duration string | How long the session must stay idle before a recap is generated. Accepts a millisecond number or a [vercel/ms](https://github.com/vercel/ms) string (e.g., `"3m"`); minimum 5000 ms, defaults to 3 minutes. |
+| `provider` | string | Provider ID for the recap model. |
+| `model` | string | Model ID for the recap model. |
 | `thinkingLevel` | `off`, `minimal`, `low`, `medium`, `high`, `xhigh` | Thinking level for the recap model. |
 
 ### Turn off the features you don't like
