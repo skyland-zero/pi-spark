@@ -131,18 +131,22 @@ Each preset must set all three fields.
 | --- | --- | --- |
 | `provider` | string | Provider ID, e.g., `anthropic`. |
 | `model` | string | Model ID, e.g., `claude-opus-4-8`. |
-| `thinkingLevel` | `off`, `minimal`, `low`, `medium`, `high`, `xhigh` | Thinking level for the preset. |
+| `thinkingLevel` | `ModelThinkingLevel` | Thinking level for the preset. |
 
 #### `RecapConfig`
 
-All fields are optional, including `thinkingLevel`.
+All fields are optional, including `thinkingLevel`. If the recap model configuration is incomplete, pi-spark falls back to the session's main model.
 
 | Field | Value | Description |
 | --- | --- | --- |
-| `idle` | number (ms) or duration string | How long the session must stay idle before a recap is generated. Accepts a millisecond number or a [vercel/ms](https://github.com/vercel/ms) string (e.g., `"3m"`); minimum 5000 ms, defaults to 3 minutes. |
+| `idle` | number (ms) or duration string | How long the session must stay idle before a recap is generated. Accepts a millisecond number or a [vercel/ms](https://github.com/vercel/ms) string (e.g., `"5m"`); minimum 5000 ms, defaults to 5 minutes. |
 | `provider` | string | Provider ID for the recap model. |
 | `model` | string | Model ID for the recap model. |
-| `thinkingLevel` | `off`, `minimal`, `low`, `medium`, `high`, `xhigh` | Thinking level for the recap model. |
+| `thinkingLevel` | `ModelThinkingLevel` | Thinking level for the recap model. |
+
+#### `ModelThinkingLevel`
+
+Valid values: `off`, `minimal`, `low`, `medium`, `high`, `xhigh`.
 
 ### Turn off the features you don't like
 
