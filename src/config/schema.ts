@@ -9,22 +9,23 @@ import { presetsConfigSchema } from "../features/presets/config";
 import { recapConfigSchema } from "../features/recap/config";
 import { webConfigSchema } from "../features/web/config";
 
-const disabled = z.literal(false);
-
 /**
- * Each feature field is `{ ... } | false`: `false` disables the feature, an object configures
- * it, and an omitted field falls back to defaults (`{}`, enabled).
+ * Raw option shape for each feature. The enable/disable/default policy lives in `loadConfig`:
+ * an omitted field falls back to `{}` (enabled with defaults), `false` disables the feature, and
+ * any other value is validated against the feature schema.
  */
-export const sparkConfigSchema = z.object({
-  credits: creditsConfigSchema.or(disabled).default({}),
-  editor: editorConfigSchema.or(disabled).default({}),
-  footer: footerConfigSchema.or(disabled).default({}),
-  fullscreen: fullscreenConfigSchema.or(disabled).default({}),
-  pi: piConfigSchema.or(disabled).default({}),
-  presets: presetsConfigSchema.or(disabled).default({}),
-  recap: recapConfigSchema.or(disabled).default({}),
-  web: webConfigSchema.or(disabled).default({}),
-});
+export const featureSchemas = {
+  credits: creditsConfigSchema,
+  editor: editorConfigSchema,
+  footer: footerConfigSchema,
+  fullscreen: fullscreenConfigSchema,
+  pi: piConfigSchema,
+  presets: presetsConfigSchema,
+  recap: recapConfigSchema,
+  web: webConfigSchema,
+} as const;
 
 /** Resolved config for every feature; `false` means the feature is disabled. */
-export type SparkConfig = z.infer<typeof sparkConfigSchema>;
+export type SparkConfig = {
+  [K in keyof typeof featureSchemas]: z.infer<(typeof featureSchemas)[K]> | false;
+};

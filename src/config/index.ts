@@ -2,25 +2,13 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { getAgentDir } from "@earendil-works/pi-coding-agent";
 
-import { sparkConfigSchema } from "./schema";
+import { featureSchemas } from "./schema";
 
 import type { ExtensionContext } from "@earendil-works/pi-coding-agent";
 import type { SparkConfig } from "./schema";
 
 type JsonValue = null | boolean | number | string | JsonValue[] | { [key: string]: JsonValue };
 type JsonObject = { [key: string]: JsonValue };
-
-/** All features disabled; used as the fallback when `spark.json` fails validation. */
-const DISABLED_CONFIG: SparkConfig = Object.freeze({
-  credits: false,
-  editor: false,
-  footer: false,
-  fullscreen: false,
-  pi: false,
-  presets: false,
-  recap: false,
-  web: false,
-});
 
 const cache = new Map<string, SparkConfig>();
 
@@ -30,23 +18,44 @@ export function loadConfig(ctx: ExtensionContext, fileName: string = "spark.json
   const cached = cache.get(key);
   if (cached) return cached;
 
-  const rawConfig = loadMergedJson(getConfigPaths(ctx.cwd, fileName)) ?? {};
-  const result = sparkConfigSchema.safeParse(rawConfig);
+  const rawValue = loadMergedJson(getConfigPaths(ctx.cwd, fileName)) ?? {};
+  const raw = isPlainObject(rawValue) ? rawValue : {};
 
-  if (!result.success) {
-    const message = result.error.issues.map((issue) => `${issue.path.join(".")}: ${issue.message}`).join("; ");
-    ctx.ui.notify(`Invalid spark config: ${message}`, "error");
+  // Validate each feature independently so a single invalid field disables only that feature
+  // (falling back to its enabled defaults) instead of taking down the whole config.
+  const config = {} as Record<keyof SparkConfig, unknown>;
+  const errors: string[] = [];
 
-    const config = DISABLED_CONFIG;
-    cache.set(key, config);
+  for (const field of Object.keys(featureSchemas) as (keyof SparkConfig)[]) {
+    const value = raw[field];
 
-    return config;
+    if (value === undefined) {
+      config[field] = {};
+      continue;
+    }
+
+    if (value === false) {
+      config[field] = false;
+      continue;
+    }
+
+    const result = featureSchemas[field].safeParse(value);
+    if (result.success) {
+      config[field] = result.data;
+      continue;
+    }
+
+    config[field] = {};
+    const detail = result.error.issues.map((issue) => `${[field, ...issue.path].join(".")}: ${issue.message}`).join("; ");
+    errors.push(detail);
   }
 
-  const config = result.data;
-  cache.set(key, config);
+  if (errors.length > 0) {
+    ctx.ui.notify(`Invalid spark config, using defaults for: ${errors.join("; ")}`, "error");
+  }
 
-  return config;
+  cache.set(key, config as SparkConfig);
+  return config as SparkConfig;
 }
 
 function getConfigPaths(cwd: string, fileName: string): [globalPath: string, projectPath: string] {
