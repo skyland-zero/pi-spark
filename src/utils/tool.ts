@@ -147,55 +147,67 @@ interface TimingState {
   startedAt?: number;
   endedAt?: number;
   interval?: ReturnType<typeof setInterval>;
+  hasResult?: boolean;
 }
 
 class ActiveTiming implements Timing {
+  // No result yet: `renderCall` owns the live "Elapsed" ticker.
   renderCall(inner: Component, ...[theme, context]: RenderCallTail): Component {
     const state = context.state as TimingState;
+
     if (context.executionStarted && state.startedAt === undefined) {
       state.startedAt = Date.now();
       delete state.endedAt;
+      delete state.hasResult;
     }
 
-    // Result is in: renderResult owns the timing line, so just settle here.
-    if (!context.isPartial) {
-      this.settle(state);
-      return inner;
-    }
-
-    // Still running, no result yet: show a live "Elapsed" line, ticking once a second.
-    if (state.startedAt === undefined) return inner;
+    // Not started, or final (`renderResult` owns the "Took" line): render nothing here.
+    if (state.startedAt === undefined || !context.isPartial) return inner;
 
     state.interval ??= setInterval(() => context.invalidate(), 1000);
-    return this.withTimingLine(inner, "Elapsed", Date.now() - state.startedAt, theme);
+
+    // `renderResult` runs later in the same render pass, so decide visibility at render time:
+    // hide once any result has arrived.
+    return this.withTimingLine(inner, "Elapsed", Date.now() - state.startedAt, theme, () => !state.hasResult);
   }
 
+  // A result exists: `renderResult` owns the line — "Elapsed" while streaming, "Took" once final.
   renderResult(inner: Component, ...[options, theme, context]: RenderResultTail): Component {
     const state = context.state as TimingState;
-    if (!options.isPartial || context.isError) this.settle(state);
+    state.hasResult = true;
+
+    const isRunning = options.isPartial && !context.isError;
+    if (!isRunning) this.settle(state);
     if (state.startedAt === undefined) return inner;
 
-    const label = options.isPartial ? "Elapsed" : "Took";
     const endTime = state.endedAt ?? Date.now();
-    return this.withTimingLine(inner, label, endTime - state.startedAt, theme);
+    return this.withTimingLine(inner, isRunning ? "Elapsed" : "Took", endTime - state.startedAt, theme);
   }
 
   private settle(state: TimingState): void {
-    if (state.startedAt !== undefined) state.endedAt ??= Date.now();
+    if (state.startedAt !== undefined) {
+      state.endedAt ??= Date.now();
+    }
+
     if (state.interval) {
       clearInterval(state.interval);
       delete state.interval;
     }
   }
 
-  private withTimingLine(content: Component, label: string, ms: number, theme: Theme): Container {
+  private withTimingLine(content: Component, label: string, ms: number, theme: Theme, visible?: () => boolean): Component {
     const container = new Container();
     container.addChild(content);
 
     container.addChild(new Spacer(1));
-    container.addChild(new Text(`${theme.fg("muted", `${label} ${formatDuration(ms)}`)}`, 0, 0));
+    container.addChild(new Text(theme.fg("muted", `${label} ${formatDuration(ms)}`), 0, 0));
 
-    return container;
+    if (!visible) return container;
+
+    return {
+      invalidate: () => container.invalidate(),
+      render: (width) => (visible() ? container.render(width) : content.render(width)),
+    };
   }
 }
 
