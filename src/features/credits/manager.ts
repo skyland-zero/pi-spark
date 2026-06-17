@@ -36,25 +36,29 @@ export class CreditsManager {
     });
   }
 
+  cancel(): void {
+    this.inflight?.abort();
+    this.inflight = undefined;
+  }
+
   private async fetch(ctx: ExtensionContext, provider: CreditsProvider, signal: AbortSignal): Promise<void> {
     try {
       const apiKey = await ctx.modelRegistry.getApiKeyForProvider(provider.id);
+      if (signal.aborted) return;
       if (!apiKey) {
         ctx.ui.setStatus(STATUS_KEY, undefined);
         return;
       }
 
-      const signals = [AbortSignal.timeout(REQUEST_TIMEOUT_MS), signal];
-      if (ctx.signal) signals.push(ctx.signal);
-
-      const credits = await provider.fetch(ctx, apiKey, AbortSignal.any(signals));
+      const signals = AbortSignal.any([AbortSignal.timeout(REQUEST_TIMEOUT_MS), signal]);
+      const credits = await provider.fetch(ctx, apiKey, signals);
 
       // The active model may have changed while the request was in flight.
       if (ctx.model?.provider !== provider.id) return;
 
       ctx.ui.setStatus(STATUS_KEY, renderCredits(ctx.ui.theme, provider.label, credits));
     } catch (error) {
-      if (signal.aborted || ctx.signal?.aborted) return;
+      if (signal.aborted) return;
       if (ctx.model?.provider !== provider.id) return;
 
       const message = error instanceof Error ? error.message : String(error);

@@ -44,6 +44,7 @@ export function registerCredits(pi: ExtensionAPI): void {
   });
 
   pi.on("session_shutdown", () => {
+    creditsManager?.cancel();
     creditsManager = undefined;
   });
 }
