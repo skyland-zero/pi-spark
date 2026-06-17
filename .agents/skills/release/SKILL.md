@@ -36,7 +36,7 @@ Release Please opens or updates a single PR labeled `autorelease: pending`. If n
 
 ```bash
 gh pr list --label "autorelease: pending" --state open --json number,title
-gh pr view <number> --json files  # Expect only the CHANGELOG and package.json bumps.
+gh pr view <number> --json files  # Expect only the CHANGELOG, package.json and package-lock.json bumps.
 gh pr merge <number> --squash
 git checkout main && git pull
 ```
