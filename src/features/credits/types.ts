@@ -16,7 +16,7 @@ export interface CreditsLane {
   percent: number | undefined;
 }
 
-/** A credits source for a pi provider, shown in the status line while that provider is active. */
+/** A credits source for a Pi provider, shown in the status line while that provider is active. */
 export interface CreditsProvider {
   readonly id: Provider;
   readonly label: string;

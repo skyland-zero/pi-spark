@@ -38,7 +38,7 @@ export const modelsAction = defineAction({
     limit: Type.Optional(Type.Number({ description: "For \"models\": Return at most this many models." })),
   },
   promptGuidelines: [
-    "Use the pi tool's \"models\" action when you need metadata of pi models; include available:true in the query unless unavailable models are needed.",
+    "Use the pi tool's \"models\" action when you need metadata of Pi models; include available:true in the query unless unavailable models are needed.",
   ],
   renderParams(args, theme) {
     const params: string[] = [];

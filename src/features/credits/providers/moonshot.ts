@@ -10,7 +10,7 @@ interface MoonshotBalanceResponse {
 
 /**
  * For Moonshot, the international and China-mainland accounts live on separate hosts and bill in
- * different currencies (USD vs CNY), which the endpoint does not report, so each pi provider ID
+ * different currencies (USD vs CNY), which the endpoint does not report, so each Pi provider ID
  * fixes both host and currency.
  */
 function createMoonshotProvider(id: string, host: string, currency: string): CreditsProvider {

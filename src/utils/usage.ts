@@ -1,7 +1,7 @@
 import type { Usage } from "@earendil-works/pi-ai";
 import type { SessionEntry } from "@earendil-works/pi-coding-agent";
 
-/** Structural type guard for the pi `Usage` shape. */
+/** Structural type guard for the Pi `Usage` shape. */
 export function isUsage(value: unknown): value is Usage {
   if (typeof value !== "object" || value === null) return false;
 

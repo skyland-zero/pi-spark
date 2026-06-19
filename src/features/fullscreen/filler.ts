@@ -22,7 +22,7 @@ export class BottomFiller implements Component {
     this.measuring = true;
 
     // Re-assert `clearOnShrink` every render pass; the TUI reads it after `render()` returns,
-    // so this wins deterministically over pi's reset to the settings value on startup/reload.
+    // so this wins deterministically over Pi's reset to the settings value on startup/reload.
     this.tui.setClearOnShrink(true);
 
     const rows = this.tui.terminal.rows;

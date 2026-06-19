@@ -65,11 +65,11 @@ pi-spark generates a short recap of the current session after it goes idle, or o
 
 pi-spark adds two agent tools:
 
-The `pi` tool lets the pi coding agent inspect and manipulate itself (~740 tokens).
+The `pi` tool lets the Pi coding agent inspect and manipulate itself (~740 tokens).
 
 - `models` lists and searches the model catalog.
 - `name` sets or updates the current session's name.
-- `whoami` shows the current pi state, including session name, active model, and thinking level.
+- `whoami` shows the current Pi state, including session name, active model, and thinking level.
 
 The `web` tool gives the agent live web access, backed by the free [Exa MCP](https://exa.ai/mcp) (~350 tokens). No separate MCP setup or API key is needed.
 

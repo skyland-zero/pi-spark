@@ -4,7 +4,7 @@ import { formatModel, formatTokens } from "../../utils/format";
 
 import type { Api, Model, ModelThinkingLevel } from "@earendil-works/pi-ai";
 
-/** Pi's built-in default thinking level, clamped per model. Not exported by pi's public API. */
+/** Pi's built-in default thinking level, clamped per model. Not exported by Pi's public API. */
 const DEFAULT_THINKING_LEVEL: ModelThinkingLevel = "medium";
 
 export type ModelMetadata = Omit<Model<Api>, "headers" | "compat"> & {
