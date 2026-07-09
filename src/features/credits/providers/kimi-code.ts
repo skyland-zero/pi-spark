@@ -5,7 +5,7 @@ import type { Credits, CreditsLane, CreditsProvider } from "../types";
 const PROVIDER = "kimi-coding";
 const URL = "https://api.kimi.com/coding/v1/usages";
 
-interface KimiCodeUsagesResponse {
+interface KimiCodeUsageResponse {
   usage?: { used?: string | number } | null;
   limits?: {
     window?: { duration?: number; timeUnit?: string } | null;
@@ -34,11 +34,11 @@ function formatWindowLabel(window?: { duration?: number; timeUnit?: string } | n
   return `${duration}${unit.replace("TIME_UNIT_", "").toLowerCase()}`;
 }
 
-function buildLane(detail: { used?: string | number } | null | undefined, label: string): CreditsLane {
+function buildLane(label: string, detail?: KimiCodeUsageResponse["usage"]): CreditsLane {
   return { label, percent: toPercent(toNumber(detail?.used)) };
 }
 
-export const kimiCodingProvider: CreditsProvider = {
+export const kimiCodeProvider: CreditsProvider = {
   id: PROVIDER,
   label: "Kimi Code",
 
@@ -51,18 +51,17 @@ export const kimiCodingProvider: CreditsProvider = {
     const response = await fetch(URL, { headers, signal });
     if (!response.ok) throw new Error("request failed");
 
-    const payload = (await response.json()) as KimiCodeUsagesResponse;
+    const payload = (await response.json()) as KimiCodeUsageResponse;
     const lanes: CreditsLane[] = [];
 
-    if (payload.limits) {
-      for (const item of payload.limits) {
-        if (!item) continue;
-        const label = formatWindowLabel(item.window);
-        lanes.push(buildLane(item.detail, label));
-      }
-    }
+    payload.limits?.forEach((item) => {
+      if (!item) return;
 
-    const weeklyLane = buildLane(payload.usage, "7d");
+      const label = formatWindowLabel(item.window);
+      lanes.push(buildLane(label, item.detail));
+    });
+
+    const weeklyLane = payload.usage ? buildLane("7d", payload.usage) : undefined;
     if (weeklyLane) lanes.push(weeklyLane);
 
     return { type: "windows", lanes };

@@ -11,16 +11,14 @@ interface CodexUsageResponse {
     primary_window?: CodexRateWindow | null;
     secondary_window?: CodexRateWindow | null;
   } | null;
-  credits?: {
-    unlimited?: boolean;
-  } | null;
+  credits?: { unlimited?: boolean } | null;
 }
 
 interface CodexRateWindow {
   used_percent?: number | string;
 }
 
-export function getAccountId(ctx: ExtensionContext): string | undefined {
+function getAccountId(ctx: ExtensionContext): string | undefined {
   const credential = ctx.modelRegistry.authStorage.get(PROVIDER) as { accountId?: string } | undefined;
   const accountId = credential?.accountId;
 
