@@ -16,7 +16,7 @@ class Editor extends CustomEditor {
 
   private spinner: Spinner;
   private workingMessage: string | undefined;
-  private slots: { modelBefore: string | undefined };
+  private slots: { modelBefore: string | undefined; planStatus: string | undefined };
 
   constructor(pi: ExtensionAPI, ctx: ExtensionContext, tui: TUI, theme: EditorTheme, keybindings: KeybindingsManager, spinner: Spinner = new Spinner()) {
     super(tui, theme, keybindings);
@@ -27,7 +27,7 @@ class Editor extends CustomEditor {
     this.spinner = spinner;
     this.spinner.setTUI(tui);
     this.workingMessage = undefined;
-    this.slots = { modelBefore: undefined };
+    this.slots = { modelBefore: undefined, planStatus: undefined };
   }
 
   setWorkingMessage(message?: string | undefined): void {
@@ -77,8 +77,14 @@ class Editor extends CustomEditor {
 
     const modelBeforeText = this.slots.modelBefore;
     const modelText = formatModel(this.ctx.model?.provider, this.ctx.model?.id, this.pi.getThinkingLevel());
+    const planStatus = this.slots.planStatus;
 
-    return theme.fg("dim", [modelBeforeText, modelText].filter(Boolean).join(" · "));
+    const parts: string[] = [];
+    if (planStatus) parts.push(theme.fg("accent", planStatus));
+    if (modelBeforeText) parts.push(modelBeforeText);
+    parts.push(modelText);
+
+    return theme.fg("dim", parts.join(" · "));
   }
 }
 
@@ -86,6 +92,23 @@ export function registerEditor(pi: ExtensionAPI, events: EventCollector): void {
   let editor: Editor | undefined = undefined;
   let spinner: Spinner | undefined = undefined;
   let runningToolCallIds = new Set<string>();
+
+  function refreshPlanStatus(ctx: ExtensionContext): void {
+    try {
+      const entries = ctx.sessionManager.getEntries();
+      for (let i = entries.length - 1; i >= 0; i--) {
+        const entry = entries[i] as { type?: string; customType?: string; data?: { enabled?: boolean } };
+        if (entry.type === "custom" && entry.customType === "plan-oc-state") {
+          const planIcon = entry.data?.enabled ? "📋" : undefined;
+          editor?.setSlot("planStatus", planIcon);
+          return;
+        }
+      }
+    } catch {
+      // session manager not available
+    }
+    editor?.setSlot("planStatus", undefined);
+  }
 
   pi.on("session_start", (_event, ctx) => {
     const config = loadConfig(ctx).editor;
@@ -104,12 +127,15 @@ export function registerEditor(pi: ExtensionAPI, events: EventCollector): void {
 
       return editor;
     });
+
+    refreshPlanStatus(ctx);
   });
 
-  pi.on("agent_start", () => {
+  pi.on("agent_start", (_event, ctx) => {
     runningToolCallIds.clear();
     editor?.setWorkingMessage();
     spinner?.start();
+    refreshPlanStatus(ctx);
   });
 
   pi.on("message_update", (event) => {
@@ -152,9 +178,10 @@ export function registerEditor(pi: ExtensionAPI, events: EventCollector): void {
     editor?.setWorkingMessage(runningToolCallIds.size > 0 ? "Running tools" : undefined);
   });
 
-  pi.on("agent_end", () => {
+  pi.on("agent_end", (_event, ctx) => {
     runningToolCallIds.clear();
     editor?.setWorkingMessage();
+    refreshPlanStatus(ctx);
   });
 
   pi.on("agent_settled", () => {
@@ -168,5 +195,10 @@ export function registerEditor(pi: ExtensionAPI, events: EventCollector): void {
     editor = undefined;
     spinner?.dispose();
     spinner = undefined;
+  });
+
+  // Track plan-oc state changes from before_agent_start (plan mode may activate)
+  pi.on("before_agent_start", (_event, ctx) => {
+    refreshPlanStatus(ctx);
   });
 }

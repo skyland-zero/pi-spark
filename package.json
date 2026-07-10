@@ -1,5 +1,5 @@
 {
-  "name": "pi-spark",
+  "name": "@narumitw/pi-spark",
   "version": "0.18.1",
   "description": "Pi package that polishes your daily experience.",
   "keywords": [
@@ -8,7 +8,8 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zlliang/pi-spark.git"
+    "url": "https://github.com/skyland-zero/pi-spark",
+    "directory": "extensions/pi-spark"
   },
   "license": "MIT",
   "type": "module",
