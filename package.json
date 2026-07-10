@@ -50,6 +50,6 @@
     "@earendil-works/pi-tui": ">=0.80.6",
     "@types/node": "*",
     "typebox": "*",
-    "typescript": "^6.0.3"
+    "typescript": "^7.0.2"
   }
 }
