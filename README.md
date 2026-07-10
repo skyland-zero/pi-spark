@@ -37,7 +37,7 @@ pi-spark ships with custom editor, footer, and fullscreen rendering, replacing t
 pi-spark shows the active provider's credit balance or rate-limit usage in the status line, so you can keep an eye on what's left without leaving the terminal.
 
 - Supported providers: DeepSeek, Fireworks, Kimi Code, Moonshot, OpenAI Codex, OpenRouter, and Vercel AI Gateway.
-- Most provider fetching follows [CodexBar](https://github.com/steipete/codexbar). Fireworks is the exception: its balance sits behind an internal gRPC API, reverse-engineered from the `firectl` binary (see [docs/fireworks.md](./docs/fireworks.md)).
+- Most provider fetching follows [CodexBar](https://github.com/steipete/codexbar). Fireworks is the exception: its balance sits behind an internal gRPC API, reverse-engineered from the `firectl` binary (see [Reverse-Engineering Fireworks Credits](./docs/reverse-engineering-fireworks-credits.md)).
 
 ![Credits](./assets/screenshot-credits.png)
 
