@@ -166,7 +166,7 @@ All fields are optional. If the title model configuration is incomplete, pi-spar
 
 #### `ModelThinkingLevel`
 
-Valid values: `off`, `minimal`, `low`, `medium`, `high`, `xhigh`.
+Valid values: `off`, `minimal`, `low`, `medium`, `high`, `xhigh`, `max`.
 
 ### Turn off the features you don't like
 

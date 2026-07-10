@@ -2,7 +2,7 @@ import * as z from "zod";
 
 import type { ModelThinkingLevel } from "@earendil-works/pi-ai";
 
-const THINKING_LEVELS = ["off", "minimal", "low", "medium", "high", "xhigh"] as const satisfies readonly ModelThinkingLevel[];
+const THINKING_LEVELS = ["off", "minimal", "low", "medium", "high", "xhigh", "max"] as const satisfies readonly ModelThinkingLevel[];
 
 export const modelSchema = z.object({
   provider: z.string().min(1),
