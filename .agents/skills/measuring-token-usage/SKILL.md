@@ -1,25 +1,25 @@
 ---
-name: measure-token-usage
+name: measuring-token-usage
 description: Measures how many prompt tokens pi's built-in system prompt and tools cost, and how many a custom tool or extension adds. Use when estimating or budgeting token usage for pi sessions, tools, or extensions.
 ---
 
-# Measure Token Usage
+# Measuring Token Usage
 
 Estimate the prompt-token cost of pi's built-in system prompt and tools, or any custom tool/extension, by triggering one real `pi -p` turn and reading the usage from its session file.
 
 ## Method
 
-Run `scripts/measure.sh <label> <provider> <model> [extra pi args...]`. It strips the request to built-ins only (`-ne -nc -ns -np`), fires a one-token `hi` prompt, and prints CSV: `label,provider,model,prompt,output`.
+Run `uv run --script scripts/measure.py <label> <provider> <model> [extra pi args...]`. It strips the request to built-ins only (`-ne -nc -ns -np`), fires a one-token `hi` prompt, and prints CSV: `label,provider,model,prompt,output`.
 
 ```bash
 # system prompt + built-in tools
-bash scripts/measure.sh base openai-codex gpt-5.5
+uv run --script scripts/measure.py base openai-codex gpt-5.5
 
 # system prompt only
-bash scripts/measure.sh notools openai-codex gpt-5.5 -nt
+uv run --script scripts/measure.py notools openai-codex gpt-5.5 -nt
 
 # baseline + a custom extension
-bash scripts/measure.sh tool openai-codex gpt-5.5 -e ./my-ext.ts
+uv run --script scripts/measure.py tool openai-codex gpt-5.5 -e ./my-ext.ts
 ```
 
 Derive: `built-in tools = base − notools`; `a custom tool/extension = (run with -e) − base`. Isolate one tool among several with `-xt <other-tool>`. Repeat across providers and average — counts differ a lot per provider (the schema is re-serialized per format).
