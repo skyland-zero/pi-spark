@@ -1,9 +1,8 @@
-import { completeSimple } from "@earendil-works/pi-ai/compat";
 import { convertToLlm, serializeConversation } from "@earendil-works/pi-coding-agent";
 
 import { clearRecapWidget, setRecapLoadingWidget, setRecapTextWidget } from "./widget";
 import { sanitizeText } from "../../utils/format";
-import { resolveModelSettings } from "../../utils/model";
+import { completeBackground, resolveModelSettings } from "../../utils/model";
 
 import type { Api, Model, ModelThinkingLevel, SimpleStreamOptions, Usage } from "@earendil-works/pi-ai";
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
@@ -85,18 +84,12 @@ export class RecapManager {
     const auth = await ctx.modelRegistry.getApiKeyAndHeaders(model);
     if (!auth.ok) throw new Error(auth.error);
 
-    const options: SimpleStreamOptions = {
-      maxTokens: MAX_TOKENS,
-      // Codex uses the session ID for request routing; without it, background calls may be
-      // routed to an unavailable model.
-      sessionId: ctx.sessionManager.getSessionId(),
-      signal,
-    };
+    const options: SimpleStreamOptions = { maxTokens: MAX_TOKENS, signal };
     if (auth.apiKey) options.apiKey = auth.apiKey;
     if (auth.headers) options.headers = auth.headers;
     if (thinkingLevel !== "off") options.reasoning = thinkingLevel;
 
-    const response = await completeSimple(model, {
+    const response = await completeBackground(model, {
       systemPrompt: SYSTEM_PROMPT,
       messages: [{
         role: "user",

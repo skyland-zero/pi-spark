@@ -1,4 +1,6 @@
-import { clampThinkingLevel } from "@earendil-works/pi-ai";
+import { uuidv7 } from "@earendil-works/pi-agent-core";
+import { clampThinkingLevel, cleanupSessionResources } from "@earendil-works/pi-ai";
+import { completeSimple } from "@earendil-works/pi-ai/compat";
 
 import { formatModel } from "./format";
 
@@ -28,6 +30,22 @@ type ThinkingLevelSelection = {
 export function isFreeModel(model: Model<Api>): boolean {
   return model.cost.input === 0 && model.cost.output === 0 && model.cost.cacheRead === 0 && model.cost.cacheWrite === 0;
 }
+
+/**
+ * Complete a one-shot background request, using an isolated session for OpenAI Codex models.
+ * See [the investigation](../../docs/background-model-calls-and-openai-codex-sessions.md).
+ */
+export const completeBackground: typeof completeSimple = async (model, context, options) => {
+  if (model.api !== "openai-codex-responses") return completeSimple(model, context, options);
+
+  const sessionId = uuidv7();
+
+  try {
+    return await completeSimple(model, context, { ...options, sessionId });
+  } finally {
+    cleanupSessionResources(sessionId);
+  }
+};
 
 /**
  * Resolve the model and thinking level for a background feature (recap, title, ...).
