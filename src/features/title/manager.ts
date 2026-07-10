@@ -12,6 +12,7 @@ const SYSTEM_PROMPT = [
   "Base the title only on the transcript; do not invent topics, files, or intent.",
   "Capture the user's main goal or the session's central task.",
   "Respond in the conversation's primary language.",
+  "For English, use sentence case, never title case. Add spaces between English and CJK text.",
   "Output a single title of 3-8 words. No trailing punctuation, quotes, markdown, or prefix like 'Title:'.",
 ].join(" ");
 
