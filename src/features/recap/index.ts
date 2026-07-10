@@ -48,7 +48,7 @@ export function registerRecap(pi: ExtensionAPI): void {
     idleListener?.wake(ctx);
   });
 
-  pi.on("agent_end", (_event, ctx) => {
+  pi.on("agent_settled", (_event, ctx) => {
     idleListener?.watch(ctx);
   });
 

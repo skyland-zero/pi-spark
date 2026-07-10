@@ -155,6 +155,11 @@ export function registerEditor(pi: ExtensionAPI, events: EventCollector): void {
   pi.on("agent_end", () => {
     runningToolCallIds.clear();
     editor?.setWorkingMessage();
+  });
+
+  pi.on("agent_settled", () => {
+    runningToolCallIds.clear();
+    editor?.setWorkingMessage();
     spinner?.stop();
   });
 

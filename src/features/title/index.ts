@@ -15,8 +15,8 @@ export function registerTitle(pi: ExtensionAPI): void {
 
   // Generate the title after the first exchange, once the session has context to summarize.
   // The manager runs at most once and skips sessions that already have a name.
-  pi.on("agent_end", (_event, ctx) => {
-    titleManager?.run(ctx);
+  pi.on("agent_settled", (_event, ctx) => {
+    void titleManager?.run(ctx);
   });
 
   pi.on("session_shutdown", () => {
