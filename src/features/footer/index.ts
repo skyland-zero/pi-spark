@@ -92,6 +92,18 @@ export function registerFooter(pi: ExtensionAPI): void {
     const config = loadConfig(ctx).footer;
     if (!ctx.hasUI || !config) return;
 
+    if (config.hidden) {
+      // Hide the footer entirely
+      ctx.ui.setFooter(() => ({
+        invalidate() {},
+        dispose() {},
+        render(_width: number): string[] {
+          return [];
+        },
+      }));
+      return;
+    }
+
     ctx.ui.setFooter((_tui, theme, footerData) => new FooterComponent(ctx, theme, footerData));
   });
 }
